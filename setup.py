@@ -18,5 +18,5 @@ setup(
     description='Automatically resize and move GDK windows according to the configuration file',
     author='Alex Wong',
     author_email='alex@gmem.cc',
-    url='https://py.gmem.cc/myautoresizer'
+    url='https://github.com/seinohitomi/my-autoresizer'
 )
