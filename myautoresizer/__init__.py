@@ -21,14 +21,31 @@ def get_win_name_or_empty(win):
         return ''
 
 
-def foreach_window(callback):
+def get_win_list():
+    win_list = []
     root = gtk.gdk.get_default_root_window()
     for wid in root.property_get('_NET_CLIENT_LIST')[2]:
         win = gtk.gdk.window_foreign_new(wid)
         if win:
-            title = get_win_name_or_empty(win)
-            if title not in EXCLUDE_WIN_TITLES:
-                callback(win)
+            win_list.append(win)
+    return win_list
+
+
+def forfirst_window(callback):
+    root = gtk.gdk.get_default_root_window()
+    for win in get_win_list():
+        title = get_win_name_or_empty(win)
+        if title not in EXCLUDE_WIN_TITLES:
+            callback(win)
+            break
+
+
+def foreach_window(callback):
+    root = gtk.gdk.get_default_root_window()
+    for win in get_win_list():
+        title = get_win_name_or_empty(win)
+        if title not in EXCLUDE_WIN_TITLES:
+            callback(win)
 
 
 def print_rect():
@@ -100,3 +117,5 @@ def auto_resize():
                 logging.error("Error in configuration: %s" % e.message)
 
     foreach_window(cb)
+    # The LAST move_resize() invocation has no effect, just a workaround:
+    forfirst_window(cb)
