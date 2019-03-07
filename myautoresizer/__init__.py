@@ -109,7 +109,7 @@ def auto_resize():
                     elif position == 'center':
                         (sw, sh) = get_scr_size()
                         x = (sw - w + 60) / 2
-                        y = (sh - h + 20) / 2
+                        y = (sh - h) / 2
                     win.move_resize(x, y, w, h)
                     logging.info("Move_resizing [x, y, w, h] to: %s , title: %s" % ([x, y, w, h], title))
                     break
