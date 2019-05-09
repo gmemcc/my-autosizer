@@ -73,14 +73,6 @@ def read_cfg():
     return cfg
 
 
-def get_scr_size():
-    tmp_win = gtk.Window()
-    scr = tmp_win.get_screen()
-    cur_mon_id = scr.get_monitor_at_window(scr.get_active_window())
-    cur_mon_geo = scr.get_monitor_geometry(cur_mon_id)
-    return cur_mon_geo[2], cur_mon_geo[3]
-
-
 def auto_resize():
     cfg = read_cfg()
 
@@ -92,6 +84,8 @@ def auto_resize():
                 title_regex = cfg.get(section, 'title_regex')
                 class_regex = cfg.get(section, 'class_regex')
                 if re.search(title_regex, title) and re.search(class_regex, cls):
+                    scr = win.get_screen()
+                    cur_mon_id = scr.get_monitor_at_window(win)
                     g = win.get_geometry()
                     x = g[0]
                     y = g[1]
@@ -107,11 +101,12 @@ def auto_resize():
                         x = cfg.getint(section, 'x')
                         y = cfg.getint(section, 'y')
                     elif position == 'center':
-                        (sw, sh) = get_scr_size()
-                        x = (sw - w + 60) / 2
+                        cur_mon_geo = scr.get_monitor_geometry(cur_mon_id)
+                        (sw, sh) = cur_mon_geo[2], cur_mon_geo[3]
+                        x = (sw - w + 60) / 2 + cur_mon_id * sw
                         y = (sh - h) / 2
                     win.move_resize(x, y, w, h)
-                    logging.info("Move_resizing [x, y, w, h] to: %s , title: %s" % ([x, y, w, h], title))
+                    logging.info("Move and resiz [x, y, w, h] to: %s , title: %s, mon: %d" % ([x, y, w, h], title, cur_mon_id))
                     break
             except ConfigParser.NoOptionError as e:
                 logging.error("Error in configuration: %s" % e.message)
