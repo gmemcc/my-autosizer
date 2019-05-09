@@ -106,7 +106,9 @@ def auto_resize():
                         x = (sw - w + 60) / 2 + cur_mon_id * sw
                         y = (sh - h) / 2
                         if cur_mon_id == 0:
-                            y += 20
+                            y += 30
+                        else:
+                            x -= 30
                     win.move_resize(x, y, w, h)
                     logging.info("Move and resiz [x, y, w, h] to: %s , title: %s, mon: %d" % ([x, y, w, h], title, cur_mon_id))
                     break
