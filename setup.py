@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="myautoresizer",
-    version="0.1.8",
+    version="0.1.8-ubuntu-14",
     packages=find_packages(exclude=["tests"]),
     package_data={
         'myautoresizer': ['*.ini'],
