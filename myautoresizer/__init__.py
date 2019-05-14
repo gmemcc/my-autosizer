@@ -84,6 +84,7 @@ def auto_resize():
                 title_regex = cfg.get(section, 'title_regex')
                 class_regex = cfg.get(section, 'class_regex')
                 if re.search(title_regex, title) and re.search(class_regex, cls):
+                    n_monitors = win.get_screen().get_n_monitors()
                     scr = win.get_screen()
                     cur_mon_id = scr.get_monitor_at_window(win)
                     g = win.get_geometry()
@@ -100,12 +101,21 @@ def auto_resize():
                     if position == 'static':
                         x = cfg.getint(section, 'x')
                         y = cfg.getint(section, 'y')
-                    elif position == 'center':
+                    elif position == 'center' or position == 'maximize':
                         cur_mon_geo = scr.get_monitor_geometry(cur_mon_id)
+                        display = 0
+                        try:
+                            display = cfg.getint(section, 'display')
+                        except:
+                            pass
+                        if display > 0 and display <= n_monitors:
+                            cur_mon_id = display - 1
                         (sw, sh) = cur_mon_geo[2], cur_mon_geo[3]
                         x = (sw - w + 60) / 2 + cur_mon_id * sw
                         y = (sh - h) / 2
                     win.move_resize(x, y, w, h)
+                    if position == 'maximize':
+                        win.maximize()
                     logging.info("Move and resiz [x, y, w, h] to: %s , title: %s, mon: %d" % ([x, y, w, h], title, cur_mon_id))
                     break
             except ConfigParser.NoOptionError as e:
