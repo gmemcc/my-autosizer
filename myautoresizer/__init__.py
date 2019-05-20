@@ -113,9 +113,7 @@ def auto_resize():
                         (sw, sh) = cur_mon_geo[2], cur_mon_geo[3]
                         x = (sw - w + 60) / 2 + cur_mon_id * sw
                         y = (sh - h) / 2
-                        if cur_mon_id == 0:
-                            y += 30
-                        else:
+                        if cur_mon_id != 0:
                             x -= 30
                     win.move_resize(x, y, w, h)
                     if position == 'maximize':
