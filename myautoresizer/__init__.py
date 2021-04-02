@@ -108,13 +108,11 @@ def auto_resize():
                             display = cfg.getint(section, 'display')
                         except:
                             pass
-                        if display > 0 and display <= n_monitors:
+                        if 0 < display <= n_monitors:
                             cur_mon_id = display - 1
-                        (sw, sh) = cur_mon_geo[2], cur_mon_geo[3]
-                        x = (sw - w + 60) / 2 + cur_mon_id * sw
-                        y = (sh - h) / 2
-                        if cur_mon_id != 0:
-                            x -= 30
+                        (sx, sy, sw, sh) = cur_mon_geo[0], cur_mon_geo[1], cur_mon_geo[2], cur_mon_geo[3]
+                        x = (sw - w + 60) / 2 + sx
+                        y = (sh - h) / 2 + sy
                     win.move_resize(x, y, w, h)
                     if position == 'maximize':
                         win.maximize()
