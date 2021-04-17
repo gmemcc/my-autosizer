@@ -84,39 +84,46 @@ def auto_resize():
                 title_regex = cfg.get(section, 'title_regex')
                 class_regex = cfg.get(section, 'class_regex')
                 if re.search(title_regex, title) and re.search(class_regex, cls):
-                    n_monitors = win.get_screen().get_n_monitors()
                     scr = win.get_screen()
+                    n_monitors = scr.get_n_monitors()
+                    idx_primary_monitor = scr.get_primary_monitor()
                     cur_mon_id = scr.get_monitor_at_window(win)
                     g = win.get_geometry()
                     x = g[0]
                     y = g[1]
                     w = g[2]
                     h = g[3]
+                    cur_mon_geo = scr.get_monitor_geometry(cur_mon_id)
+                    (sx, sy, sw, sh) = cur_mon_geo[0], cur_mon_geo[1], cur_mon_geo[2], cur_mon_geo[3]
+                    # hack
+                    scale_factor = 1
+                    if sw == 3840 and sh == 2160:
+                        scale_factor = 2
                     size = cfg.get(section, 'size')
                     if size == 'static':
                         win.unmaximize()
-                        w = cfg.getint(section, 'width')
-                        h = cfg.getint(section, 'height')
+                        w = cfg.getint(section, 'width') * scale_factor
+                        h = cfg.getint(section, 'height') * scale_factor
+                    elif size == 'keep':
+                        w = w * scale_factor
+                        h = h * scale_factor
                     position = cfg.get(section, 'position')
+                    is_primary = idx_primary_monitor == cur_mon_id
+                    x_offset = 0
+                    y_offset = 0
+                    if is_primary:
+                        x_offset = 36 * scale_factor
                     if position == 'static':
-                        x = cfg.getint(section, 'x')
-                        y = cfg.getint(section, 'y')
+                        x = cfg.getint(section, 'x') * scale_factor + x_offset
+                        y = cfg.getint(section, 'y') * scale_factor + y_offset
                     elif position == 'center' or position == 'maximize':
-                        cur_mon_geo = scr.get_monitor_geometry(cur_mon_id)
-                        display = 0
-                        try:
-                            display = cfg.getint(section, 'display')
-                        except:
-                            pass
-                        if 0 < display <= n_monitors:
-                            cur_mon_id = display - 1
-                        (sx, sy, sw, sh) = cur_mon_geo[0], cur_mon_geo[1], cur_mon_geo[2], cur_mon_geo[3]
-                        x = (sw - w + 60) / 2 + sx
-                        y = (sh - h) / 2 + sy
+                        y_offset = 22 * scale_factor
+                        x = (sw - w + x_offset) / 2 + sx
+                        y = (sh - h + y_offset) / 2 + sy
                     win.move_resize(x, y, w, h)
                     if position == 'maximize':
                         win.maximize()
-                    logging.info("Move and resiz [x, y, w, h] to: %s , title: %s, mon: %d" % ([x, y, w, h], title, cur_mon_id))
+                    logging.info("Move and resize [x, y, w, h] to: %s , title: %s, mon: %d" % ([x, y, w, h], title, cur_mon_id))
                     break
             except ConfigParser.NoOptionError as e:
                 logging.error("Error in configuration: %s" % e.message)
