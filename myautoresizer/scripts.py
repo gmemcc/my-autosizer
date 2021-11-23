@@ -8,4 +8,9 @@ def ma_printrect():
 
 def ma_autoresize():
     config_logging_default()
-    auto_resize()
+    auto_resize(False)
+
+
+def ma_autoresize_active():
+    config_logging_default()
+    auto_resize(True)

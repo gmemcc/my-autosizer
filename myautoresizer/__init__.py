@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import shutil
+import time
 from os.path import expanduser, exists
 
 EXCLUDE_WIN_TITLES = ['Desktop', 'XdndCollectionWindowImp', 'unity-launcher', 'unity-panel', 'unity-dash', 'Hud']
@@ -40,6 +41,11 @@ def forfirst_window(callback):
             break
 
 
+def foractive_window(callback):
+    active_window = gtk.gdk.get_default_root_window().get_screen().get_active_window()
+    callback(active_window)
+
+
 def foreach_window(callback):
     root = gtk.gdk.get_default_root_window()
     for win in get_win_list():
@@ -73,7 +79,7 @@ def read_cfg():
     return cfg
 
 
-def auto_resize():
+def auto_resize(active_win_only):
     cfg = read_cfg()
 
     def cb(win):
@@ -105,8 +111,7 @@ def auto_resize():
                         w = cfg.getint(section, 'width') * scale_factor
                         h = cfg.getint(section, 'height') * scale_factor
                     elif size == 'keep':
-                        w = w * scale_factor
-                        h = h * scale_factor
+                        pass
                     position = cfg.get(section, 'position')
                     is_primary = idx_primary_monitor == cur_mon_id
                     x_offset = 0
@@ -114,8 +119,21 @@ def auto_resize():
                     if is_primary:
                         x_offset = 36 * scale_factor
                     if position == 'static':
-                        x = cfg.getint(section, 'x') * scale_factor + x_offset
-                        y = cfg.getint(section, 'y') * scale_factor + y_offset
+                        relative_to = 'left_top'
+                        try:
+                            relative_to = cfg.get(section, 'relative_to')
+                        except:
+                            pass
+                        if relative_to.find('left') > -1:
+                            x = cfg.getint(section, 'x') * scale_factor + x_offset
+                        else:
+                            x = sw - w - cfg.getint(section, 'x') * scale_factor
+                        if relative_to.find('top') > -1:
+                            y = cfg.getint(section, 'y') * scale_factor + y_offset
+                        else:
+                            y = sh - h - cfg.getint(section, 'y') * scale_factor
+                        x += sx
+                        y += sy
                     elif position == 'center' or position == 'maximize':
                         y_offset = 22 * scale_factor
                         x = (sw - w + x_offset) / 2 + sx
@@ -128,6 +146,12 @@ def auto_resize():
             except ConfigParser.NoOptionError as e:
                 logging.error("Error in configuration: %s" % e.message)
 
-    foreach_window(cb)
-    # The LAST move_resize() invocation has no effect, just a workaround:
-    forfirst_window(cb)
+    time.sleep(5)
+    if active_win_only:
+        foractive_window(cb)
+        # The LAST move_resize() invocation has no effect, just a workaround:
+        foractive_window(cb)
+    else:
+        foreach_window(cb)
+        # The LAST move_resize() invocation has no effect, just a workaround:
+        forfirst_window(cb)

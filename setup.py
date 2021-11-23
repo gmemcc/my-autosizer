@@ -13,6 +13,7 @@ setup(
         'console_scripts': [
             'ma_printrect = myautoresizer.scripts:ma_printrect',
             'ma_autoresize = myautoresizer.scripts:ma_autoresize',
+            'ma_autoresize_active = myautoresizer.scripts:ma_autoresize_active',
         ],
     },
     description='Automatically resize and move GDK windows according to the configuration file',
