@@ -146,7 +146,6 @@ def auto_resize(active_win_only):
             except ConfigParser.NoOptionError as e:
                 logging.error("Error in configuration: %s" % e.message)
 
-    time.sleep(5)
     if active_win_only:
         foractive_window(cb)
         # The LAST move_resize() invocation has no effect, just a workaround:
