@@ -114,10 +114,20 @@ def auto_resize(active_win_only):
                         pass
                     position = cfg.get(section, 'position')
                     is_primary = idx_primary_monitor == cur_mon_id
+                    x_ubuntu_offset = 0
+                    y_ubuntu_offset = 0
                     x_offset = 0
+                    try:
+                        x_offset = cfg.getint(section, 'x')
+                    except:
+                        pass
                     y_offset = 0
+                    try:
+                        y_offset = cfg.getint(section, 'y')
+                    except:
+                        pass
                     if is_primary:
-                        x_offset = 36 * scale_factor
+                        x_ubuntu_offset = 36 * scale_factor
                     if position == 'static':
                         relative_to = 'left_top'
                         try:
@@ -125,19 +135,19 @@ def auto_resize(active_win_only):
                         except:
                             pass
                         if relative_to.find('left') > -1:
-                            x = cfg.getint(section, 'x') * scale_factor + x_offset
+                            x = x_offset * scale_factor + x_ubuntu_offset
                         else:
                             x = sw - w - cfg.getint(section, 'x') * scale_factor
                         if relative_to.find('top') > -1:
-                            y = cfg.getint(section, 'y') * scale_factor + y_offset
+                            y = y_offset * scale_factor + y_ubuntu_offset
                         else:
                             y = sh - h - cfg.getint(section, 'y') * scale_factor
                         x += sx
                         y += sy
                     elif position == 'center' or position == 'maximize':
-                        y_offset = 22 * scale_factor
-                        x = (sw - w + x_offset) / 2 + sx
-                        y = (sh - h + y_offset) / 2 + sy
+                        y_ubuntu_offset = 22 * scale_factor
+                        x = (sw - w + x_ubuntu_offset) / 2 + sx + x_offset * scale_factor
+                        y = (sh - h + y_ubuntu_offset) / 2 + sy + y_offset * scale_factor
                     win.move_resize(x, y, w, h)
                     if position == 'maximize':
                         win.maximize()
